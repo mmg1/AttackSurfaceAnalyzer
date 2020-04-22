@@ -2,22 +2,27 @@
 // Licensed under the MIT License.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
+using Tpm2Lib;
 
 namespace AttackSurfaceAnalyzer.Objects
 {
     public class TpmObject : CollectObject
     {
-        public Dictionary<string,byte[]> NV { get; set; }     
-        public string Manufacturer { get; set; }
+        public Dictionary<byte[], object> NV { get; set; } = new Dictionary<string, object>();
+        public Dictionary<(TpmAlgId, int), byte[]> PCRs { get; set; } = new Dictionary<(TpmAlgId, int), byte[]>();
+        public string? Manufacturer { get; set; }
         public DateTime TpmSpecDate { get; set; }
         public uint[] Version { get; }
+        public string Location { get; set; }
 
-        public TpmObject(uint[] Version)
+
+        public TpmObject(uint[] Version, string Location)
         {
             ResultType = Types.RESULT_TYPE.TPM;
-            NV = new Dictionary<string, byte[]>();
             this.Version = Version;
+            this.Location = Location;
             // TODO: Transform the version into a readable string
         }
 
@@ -25,7 +30,7 @@ namespace AttackSurfaceAnalyzer.Objects
         {
             get
             {
-                return JsonConvert.SerializeObject(NV);
+                return Location;
             }
         }
     }
