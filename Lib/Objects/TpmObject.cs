@@ -9,11 +9,16 @@ namespace AttackSurfaceAnalyzer.Objects
     public class TpmObject : CollectObject
     {
         public Dictionary<string,byte[]> NV { get; set; }     
+        public string Manufacturer { get; set; }
+        public DateTime TpmSpecDate { get; set; }
+        public uint[] Version { get; }
 
-        public TpmObject()
+        public TpmObject(uint[] Version)
         {
             ResultType = Types.RESULT_TYPE.TPM;
             NV = new Dictionary<string, byte[]>();
+            this.Version = Version;
+            // TODO: Transform the version into a readable string
         }
 
         public override string Identity
