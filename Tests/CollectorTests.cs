@@ -138,7 +138,6 @@ namespace AttackSurfaceAnalyzer.Tests
                 tpmc.Execute();
 
                 process.Kill();
-                //tpmSim.StopSimulator();
             }
         }
 
@@ -162,7 +161,6 @@ namespace AttackSurfaceAnalyzer.Tests
 
                 tpmc.Execute();
 
-                // TODO: This doesn't work yet.
                 simulator.StopSimulator();
             }
         }
