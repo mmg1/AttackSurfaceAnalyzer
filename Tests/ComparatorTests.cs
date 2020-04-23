@@ -79,8 +79,8 @@ namespace AttackSurfaceAnalyzer.Tests
             var results = bc.Results;
 
             Assert.IsTrue(results.ContainsKey((RESULT_TYPE.FILE, CHANGE_TYPE.CREATED)));
-            Assert.IsTrue(results[(RESULT_TYPE.FILE, CHANGE_TYPE.CREATED)].Any(x => x.Identity.Contains("AsaLibTesterMZ") && ((FileSystemObject)x.Compare).IsExecutable == true));
-            Assert.IsTrue(results[(RESULT_TYPE.FILE, CHANGE_TYPE.CREATED)].Any(x => x.Identity.Contains("AsaLibTesterJavaClass") && ((FileSystemObject)x.Compare).IsExecutable == true));
+            Assert.IsTrue(results[(RESULT_TYPE.FILE, CHANGE_TYPE.CREATED)].Any(x => x.Identity.Contains("AsaLibTesterMZ") && x.Compare is FileSystemObject FSO && FSO.IsExecutable is bool isExe && isExe));
+            Assert.IsTrue(results[(RESULT_TYPE.FILE, CHANGE_TYPE.CREATED)].Any(x => x.Identity.Contains("AsaLibTesterJavaClass") && x.Compare is FileSystemObject FSO && FSO.IsExecutable is bool isExe && isExe));
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace AttackSurfaceAnalyzer.Tests
             var opc = new OpenPortCollector();
             opc.Execute();
 
-            TcpListener server = null;
+            TcpListener? server = null;
             try
             {
                 // Set the TcpListener on port 13000.
@@ -161,7 +161,7 @@ namespace AttackSurfaceAnalyzer.Tests
             var opc2 = new OpenPortCollector();
             opc2.Execute();
 
-            server.Stop();
+            server?.Stop();
 
             Assert.IsTrue(opc2.Results.Any(x => x is OpenPortObject OPO && OPO.Port == 13000));
 
@@ -266,7 +266,7 @@ namespace AttackSurfaceAnalyzer.Tests
                 rc2.Execute();
 
                 Assert.IsTrue(rc2.Results.Any(x => x is RegistryObject RO && RO.Key.EndsWith(name)));
-                Assert.IsTrue(rc2.Results.Any(x => x is RegistryObject RO && RO.Key.EndsWith(name) && RO.Values.ContainsKey(value) && RO.Values[value] == value2));
+                Assert.IsTrue(rc2.Results.Any(x => x is RegistryObject RO && RO.Key.EndsWith(name) && RO.Values != null && RO.Values.ContainsKey(value) && RO.Values[value] == value2));
 
                 // Clean up
                 Registry.CurrentUser.DeleteSubKey(name);
@@ -406,8 +406,8 @@ namespace AttackSurfaceAnalyzer.Tests
                 var results = bc.Results;
 
                 Assert.IsTrue(results.ContainsKey((RESULT_TYPE.FIREWALL, CHANGE_TYPE.CREATED)));
-                Assert.IsTrue(results[(RESULT_TYPE.FIREWALL, CHANGE_TYPE.CREATED)].Where(x => ((FirewallObject)x.Compare).LocalPorts.Contains("9999")).Count() > 0);
-                Assert.IsTrue(results[(RESULT_TYPE.FIREWALL, CHANGE_TYPE.CREATED)].Where(x => x.Identity.Contains("MyApp.exe")).Count() > 0);
+                Assert.IsTrue(results[(RESULT_TYPE.FIREWALL, CHANGE_TYPE.CREATED)].Any(x => x.Compare is FirewallObject FWO && FWO.LocalPorts is List<string> ports && ports.Contains("9999")));
+                Assert.IsTrue(results[(RESULT_TYPE.FIREWALL, CHANGE_TYPE.CREATED)].Any(x => x.Identity.Contains("MyApp.exe")));
             }
         }
     }
