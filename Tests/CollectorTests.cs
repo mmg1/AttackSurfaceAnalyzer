@@ -119,8 +119,8 @@ namespace AttackSurfaceAnalyzer.Tests
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "Simulator.exe",
-                        RedirectStandardOutput = false,
-                        RedirectStandardError = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
                         UseShellExecute = false,
                         CreateNoWindow = true,
                         WindowStyle = ProcessWindowStyle.Hidden
@@ -136,6 +136,7 @@ namespace AttackSurfaceAnalyzer.Tests
                 // Measure to a PCR
 
                 tpmc.Execute();
+
                 process.Kill();
                 //tpmSim.StopSimulator();
             }
