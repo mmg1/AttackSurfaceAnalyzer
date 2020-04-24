@@ -9,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -136,7 +137,14 @@ namespace AttackSurfaceAnalyzer.Utils
             {
                 if (SqliteFilename != filename)
                 {
-                    SqliteFilename = filename;
+                    if (Path.IsPathRooted(filename))
+                    {
+                        SqliteFilename = filename;
+                    }
+                    else
+                    {
+                        SqliteFilename = $"{Directory.GetCurrentDirectory()}{Path.DirectorySeparatorChar}{filename}";
+                    }
                 }
             }
 
