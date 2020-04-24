@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-using AttackSurfaceAnalyzer.Objects;
 using AttackSurfaceAnalyzer.Utils;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -31,7 +30,7 @@ namespace AttackSurfaceAnalyzer.Collectors
 
         public RegistryCollector(List<RegistryHive> Hives, bool Parallelize) : this(Hives.Select(x => (x, string.Empty)).ToList(), Parallelize) { }
 
-        public RegistryCollector(List<(RegistryHive,string)> Hives, bool Parallelize)
+        public RegistryCollector(List<(RegistryHive, string)> Hives, bool Parallelize)
         {
             this.Hives = Hives;
             this.Parallelize = Parallelize;
