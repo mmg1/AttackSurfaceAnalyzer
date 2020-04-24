@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Security;
 using WindowsFirewallHelper;
 
 namespace AttackSurfaceAnalyzer.Tests
@@ -95,28 +96,12 @@ namespace AttackSurfaceAnalyzer.Tests
             var elc = new EventLogCollector();
             elc.Execute();
 
-            var source = "AsaTests";
-            var logname = "AsaTestLogs";
-
-            if (EventLog.SourceExists(source))
-            {
-                // Delete the source and the log.
-                EventLog.DeleteEventSource(source);
-                EventLog.Delete(logname);
-            }
-
-            // Create the event source to make next try successful.
-            EventLog.CreateEventSource(source, logname);
-
             using EventLog eventLog = new EventLog("Application");
             eventLog.Source = "Attack Surface Analyzer Tests";
             eventLog.WriteEntry("This Log Entry was created for testing the Attack Surface Analyzer library.", EventLogEntryType.Warning, 101, 1);
 
             var elc2 = new EventLogCollector();
             elc2.Execute();
-
-            EventLog.DeleteEventSource(source);
-            EventLog.Delete(logname);
 
             Assert.IsTrue(elc2.Results.Any(x => x is EventLogObject ELO && ELO.Source == "Attack Surface Analyzer Tests" && ELO.Timestamp is DateTime DT && DT.AddMinutes(1).CompareTo(DateTime.Now) > 0));
 
@@ -248,8 +233,9 @@ namespace AttackSurfaceAnalyzer.Tests
             {
                 var FirstRunId = "TestRegistryCollector-1";
                 var SecondRunId = "TestRegistryCollector-2";
-
-                var rc = new RegistryCollector(new List<RegistryHive>() { RegistryHive.CurrentUser }, true);
+                var path = "Software";
+                var hives = new List<(RegistryHive, string)>() { (RegistryHive.CurrentUser, path) };
+                var rc = new RegistryCollector(hives, false);
                 rc.Execute();
 
                 // Create a registry key
@@ -258,18 +244,19 @@ namespace AttackSurfaceAnalyzer.Tests
                 var value2 = Guid.NewGuid().ToString();
 
                 RegistryKey key;
-                key = Registry.CurrentUser.CreateSubKey(name);
-                key.SetValue(value, value2);
-                key.Close();
+                key = Registry.CurrentUser.OpenSubKey(path);
+                var subKey = key.CreateSubKey(name);
+                subKey.SetValue(value, value2);
+                subKey.Close();
 
-                var rc2 = new RegistryCollector(new List<RegistryHive>() { RegistryHive.CurrentUser }, true);
+                var rc2 = new RegistryCollector(hives, false);
                 rc2.Execute();
 
                 Assert.IsTrue(rc2.Results.Any(x => x is RegistryObject RO && RO.Key.EndsWith(name)));
                 Assert.IsTrue(rc2.Results.Any(x => x is RegistryObject RO && RO.Key.EndsWith(name) && RO.Values != null && RO.Values.ContainsKey(value) && RO.Values[value] == value2));
 
                 // Clean up
-                Registry.CurrentUser.DeleteSubKey(name);
+                key.DeleteSubKey(name);
 
                 BaseCompare bc = new BaseCompare();
 
@@ -288,6 +275,7 @@ namespace AttackSurfaceAnalyzer.Tests
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                Assert.IsTrue(AsaHelpers.IsAdmin());
                 var FirstRunId = "TestServiceCollector-1";
                 var SecondRunId = "TestServiceCollector-2";
 
