@@ -4,13 +4,13 @@ using AttackSurfaceAnalyzer.Types;
 using AttackSurfaceAnalyzer.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Tests
+namespace AttackSurfaceAnalyzer.Tests
 {
     [TestClass]
     public class HydrationTests
     {
         [ClassInitialize]
-        public static void ClassSetup()
+        public static void ClassSetup(TestContext _)
         {
             Logger.Setup(false, true);
             Strings.Setup();
