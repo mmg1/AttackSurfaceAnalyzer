@@ -258,7 +258,7 @@ namespace AttackSurfaceAnalyzer.Utils
             return ASA_ERROR.NONE;
         }
 
-        private static Settings? GetSettings()
+        public static Settings? GetSettings()
         {
             try
             {
@@ -287,7 +287,7 @@ namespace AttackSurfaceAnalyzer.Utils
             return null;
         }
 
-        private static void SetSettings(Settings settings)
+        public static void SetSettings(Settings settings)
         {
             if (MainConnection != null && MainConnection.Connection != null)
             {
