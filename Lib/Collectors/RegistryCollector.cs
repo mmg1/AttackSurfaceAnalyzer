@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -17,7 +18,7 @@ namespace AttackSurfaceAnalyzer.Collectors
     /// </summary>
     public class RegistryCollector : BaseCollector
     {
-        private readonly List<RegistryHive> Hives;
+        private readonly List<(RegistryHive, string)> Hives;
         private readonly bool Parallelize;
 
         private static readonly List<RegistryHive> DefaultHives = new List<RegistryHive>()
@@ -25,14 +26,14 @@ namespace AttackSurfaceAnalyzer.Collectors
             RegistryHive.ClassesRoot, RegistryHive.CurrentConfig, RegistryHive.CurrentUser, RegistryHive.LocalMachine, RegistryHive.Users
         };
 
-        private readonly Action<RegistryObject>? customCrawlHandler;
 
-        public RegistryCollector(bool Parallelize) : this(DefaultHives, Parallelize, null) { }
+        public RegistryCollector(bool Parallelize) : this(DefaultHives, Parallelize) { }
 
-        public RegistryCollector(List<RegistryHive> Hives, bool Parallelize, Action<RegistryObject>? customHandler = null)
+        public RegistryCollector(List<RegistryHive> Hives, bool Parallelize) : this(Hives.Select(x => (x, string.Empty)).ToList(), Parallelize) { }
+
+        public RegistryCollector(List<(RegistryHive,string)> Hives, bool Parallelize)
         {
             this.Hives = Hives;
-            customCrawlHandler = customHandler;
             this.Parallelize = Parallelize;
         }
 
@@ -64,8 +65,8 @@ namespace AttackSurfaceAnalyzer.Collectors
                     }
                 };
 
-                var x86_Enumerable = RegistryWalker.WalkHive(hive, RegistryView.Registry32);
-                var x64_Enumerable = RegistryWalker.WalkHive(hive, RegistryView.Registry64);
+                var x86_Enumerable = RegistryWalker.WalkHive(hive.Item1, RegistryView.Registry32, hive.Item2);
+                var x64_Enumerable = RegistryWalker.WalkHive(hive.Item1, RegistryView.Registry64, hive.Item2);
 
                 if (Parallelize)
                 {
@@ -74,7 +75,7 @@ namespace AttackSurfaceAnalyzer.Collectors
                     {
                         IterateOn(registryKey, RegistryView.Registry32);
                     }));
-                    Parallel.ForEach(x86_Enumerable,
+                    Parallel.ForEach(x64_Enumerable,
                     (registryKey =>
                     {
                         IterateOn(registryKey, RegistryView.Registry64);
