@@ -335,6 +335,9 @@ namespace AttackSurfaceAnalyzer.Collectors
                             break;
                     }
                 }
+
+                obj.LastModified = File.GetLastWriteTimeUtc(path);
+                obj.Created = File.GetCreationTimeUtc(path);
             }
             catch (Exception e) when (
                 e is ArgumentNullException ||
@@ -351,9 +354,6 @@ namespace AttackSurfaceAnalyzer.Collectors
             {
                 Log.Debug("Should be caught in DirectoryWalker {0}", e.GetType().ToString());
             }
-
-            obj.LastModified = File.GetLastWriteTimeUtc(path);
-            obj.Created = File.GetCreationTimeUtc(path);
 
             return obj;
         }
