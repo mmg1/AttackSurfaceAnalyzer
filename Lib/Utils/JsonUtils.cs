@@ -3,6 +3,7 @@
 using AttackSurfaceAnalyzer.Objects;
 using AttackSurfaceAnalyzer.Types;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 
 namespace AttackSurfaceAnalyzer.Utils
@@ -52,7 +53,12 @@ namespace AttackSurfaceAnalyzer.Utils
                     return JsonConvert.DeserializeObject<ComObject>(bytes);
                 case RESULT_TYPE.LOG:
                     return JsonConvert.DeserializeObject<EventLogObject>(bytes);
+                case RESULT_TYPE.TPM:
+                    return JsonConvert.DeserializeObject<TpmObject>(bytes);
+                case RESULT_TYPE.KEY:
+                    return JsonConvert.DeserializeObject<CryptographicKeyObject>(bytes);
                 default:
+                    Log.Debug($"I don't know how to Hydrate a {type}");
                     return null;
             }
         }
