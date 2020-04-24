@@ -28,7 +28,7 @@ namespace AttackSurfaceAnalyzer.Utils
         {
             if (bytes == null)
             {
-                throw new NullReferenceException();
+                return null;
             }
             switch (type)
             {
