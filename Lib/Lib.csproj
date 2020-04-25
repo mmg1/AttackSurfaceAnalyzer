@@ -67,7 +67,6 @@
     <PackageReference Include="WindowsFirewallHelper" Version="2.0.2.29-beta1" />
     <PackageReference Include="CommandLineParser" Version="2.7.82" />
     <PackageReference Include="sqlite" Version="3.13.0" />
-    <PackageReference Include="Microsoft.TSS" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\analyses.json" Link="analyses.json" />
@@ -78,5 +77,14 @@
     <None Include="..\README.md" Link="README.md" />
 	<None Include="..\icon-128.png" Pack="true" PackagePath="" />
 	<None Include="..\LICENSE.txt" Pack="true" PackagePath="" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Tpm2TesterFramework">
+      <HintPath>..\Tests\Tpm2TesterFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="TSS.Net, Version=2.1.1.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="TSS.Net">
+      <HintPath>TSS.Net.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
